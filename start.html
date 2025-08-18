@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilavra Sinha</title>
+    <link rel="stylesheet" href="a.css">
+    <style>
+        :root{
+            /* accent uses H S% L% components for convenient hsl() usage */
+            --accent-h: 180;
+            --accent-s: 80%;
+            --accent-l: 60%;
+            /* theme variables (dark defaults) */
+            --bg: linear-gradient(180deg,#03060a,#071018 60%);
+            --page-bg-overlay: radial-gradient(ellipse at 20% 10%, rgba(10,20,30,0.75), transparent 20%);
+            --text: #9fffe0;
+            --muted: rgba(160,255,230,0.6);
+            --profile-text: #bfe9ff;
+            --name-color: #b8ffee;
+            --card-bg: linear-gradient(180deg, rgba(3,6,12,0.8), rgba(4,12,20,0.72));
+            --card-border: rgba(0,255,200,0.06);
+            --profile-bg: linear-gradient(180deg, rgba(2,8,12,0.6), rgba(4,12,20,0.5));
+            --bubble-bg: linear-gradient(180deg, rgba(0,255,200,0.12), rgba(0,180,150,0.06));
+            --bubble-text: #00201a;
+            --link-color: rgba(160,255,230,0.95);
+            --accent: var(--accent-h) var(--accent-s) var(--accent-l);
+            --accent-color: hsl(var(--accent) / 1);
+            --shadow: 0 18px 60px rgba(0,0,0,0.6);
+        }
+
+        /* Light theme overrides */
+        :root[data-theme='light'], [data-theme='light']{
+            --bg: linear-gradient(180deg,#ffffff,#8ab6e2 60%);
+            --page-bg-overlay: linear-gradient(135deg, rgba(60, 150, 219, 0.12), rgba(220,80,120,0.08));
+            --text: #0f172a;
+            --muted: rgba(10,20,40,0.65);
+            --name-color: #042033;
+            --card-bg: rgba(255,255,255,0.95);
+            --card-border: rgba(10,15,30,0.06);
+            --profile-bg: linear-gradient(180deg,rgba(255,255,255,0.95),rgba(250,250,250,0.95));
+            --bubble-bg: linear-gradient(180deg,hsl(180 30% 70%),hsl(180 20% 85%));
+            --bubble-text: #05303a;
+            --link-color: #0b1220;
+        --profile-text: #0b1220;
+            --accent-color: hsl(73, 72%, 76%);
+            --shadow: 0 8px 30px rgba(10,15,30,0.12);
+        }
+        html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+        body{
+            display:flex;align-items:center;justify-content:center;
+            background: var(--page-bg-overlay), var(--bg);
+            color: var(--text);
+            transition: background-color 420ms ease, color 420ms ease, background 420ms ease;
+            padding:28px;
+            font-family: 'SFMono-Regular',Consolas,Menlo,Monaco,monospace;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            background-attachment:fixed;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px), radial-gradient(circle at 10% 10%, rgba(0,255,200,0.02), transparent 10%);
+            background-size: 100% 44px, 44px 100%, auto;
+        }
+
+    /* Background video fills the viewport (kept) */
+    #bgVideo{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;opacity:0.45;pointer-events:none;filter:blur(6px) contrast(1.05) saturate(1.1) hue-rotate(-10deg);transition:filter 300ms ease}
+        .card{
+            position:relative;z-index:2;width:100%;max-width:960px;background:var(--card-bg);border-radius:12px;border:1px solid var(--card-border);
+            padding:28px;display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:center;box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,0.02);
+            backdrop-filter: blur(6px) saturate(1.05);
+            transition: background 420ms ease, border-color 420ms ease, box-shadow 420ms ease, color 420ms ease;
+        }
+        @media (max-width:720px){
+            .card{grid-template-columns:1fr;}
+        }
+    .tab-panel{width:100%;margin-top:12px;color:var(--profile-text);transition:color 360ms ease}
+    .photo-bubble{
+        width:110px;
+        height:110px;
+        border-radius:999px;
+        overflow:hidden;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:var(--bubble-bg);
+        box-shadow:0 8px 30px rgba(0,255,200,0.04), 0 2px 6px rgba(0,0,0,0.6);
+        transition:transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms, filter 220ms, background 420ms ease;
+        flex-shrink:0;
+        cursor:default;
+        border:1px solid rgba(0,255,200,0.06);
+    }
+    .github-link{
+        width:48px;
+        height:48px;
+        padding:8px;
+        border-radius:12px;
+        background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,255,200,0.02));
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        transition:transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms, background-color 160ms, color 320ms, background 420ms ease;
+        color:var(--link-color);
+    }
+    /* floating top-right theme button */
+    .theme-top-btn{position:fixed;top:16px;right:16px;z-index:999;border:0;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.12);color:var(--link-color);cursor:pointer;backdrop-filter:blur(4px);box-shadow:0 8px 30px rgba(0,0,0,0.45);transition:transform 160ms ease,background 240ms ease,color 240ms ease}
+    .theme-top-btn:hover,.theme-top-btn:focus{transform:translateY(-3px);background:rgba(255,255,255,0.04)}
+    .main h1{font-size:clamp(26px,4vw,42px);margin:0 0 8px 0;letter-spacing:0.02em;color:var(--name-color);text-shadow:0 6px 18px rgba(0,255,200,0.06)}
+    .subtitle{margin:0;color:var(--muted);font-size:13px}
+        .actions{margin-top:18px}
+        button.toggle{
+            appearance:none;border:0;padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,hsl(var(--accent)/0.18),hsl(var(--accent)/0.12));
+            color:#042033;font-weight:600;cursor:pointer;box-shadow:0 6px 18px hsl(var(--accent)/0.12);
+        }
+        button.toggle:focus{outline:3px solid hsl(var(--accent)/0.18)}
+        .profile{
+            background:var(--profile-bg);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;
+            transition:transform 240ms ease,opacity 240ms ease,height 240ms ease,box-shadow 240ms;
+            border:1px solid rgba(0,255,200,0.04);
+            box-shadow:0 8px 30px rgba(0,200,150,0.035);
+        }
+        .profile.hidden{opacity:0;transform:translateY(-8px);height:0;padding-top:0;padding-bottom:0;overflow:hidden}
+    /* photo bubble: circular placeholder that enlarges on hover/focus (futuristic) */
+    .photo-bubble{width:110px;height:110px;border-radius:999px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bubble-bg);box-shadow:0 8px 30px rgba(0,255,200,0.04), 0 2px 6px rgba(0,0,0,0.6);transition:transform 220ms cubic-bezier(.2,.9,.2,1),box-shadow 220ms,filter 220ms;flex-shrink:0;cursor:default;border:1px solid rgba(0,255,200,0.06)}
+    .photo-bubble:hover,.photo-bubble:focus-visible{transform:scale(1.24);box-shadow:0 28px 80px rgba(0,255,200,0.12),0 6px 18px rgba(0,0,0,0.6);filter:drop-shadow(0 10px 40px rgba(0,255,180,0.06));}
+    .avatar{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--bubble-text);font-weight:800;font-size:28px;text-shadow:0 1px 0 rgba(255,255,255,0.02)}
+    .photo-img{width:100%;height:100%;object-fit:cover;display:block}
+    .photo-img.hidden{display:none}
+    .upload-btn{appearance:none;border:0;padding:8px 10px;border-radius:8px;background:rgba(10,20,30,0.06);cursor:pointer}
+        .meta{display:flex;flex-direction:column;align-items:center;text-align:center}
+        .meta p{margin:4px 0;color:rgb(220, 140, 245)}
+        /* tabs */
+        .tabs{display:flex;justify-content:center;gap:6px;border-radius:10px;background:transparent;margin-top:10px;width:100%}
+        .tab-button{appearance:none;border:0;padding:8px 12px;border-radius:8px;background:rgba(10,20,30,0.04);cursor:pointer;font-weight:700;position:relative}
+    .tab-button[aria-selected="true"]{background:linear-gradient(180deg,hsl(var(--accent) / 0.14),hsl(var(--accent) / 0.08));box-shadow:0 8px 22px rgba(10,20,30,0.08)}
+        /* make the Profile tab label explicitly white for contrast */
+        #tab-profile { color: #007fe7; }
+    /* make the Contact tab label explicitly white for contrast */
+    #tab-contact { color: #0cdbff; }
+        .tab-panel{width:100%;margin-top:12px}
+        .tab-panel.hidden{display:none}
+    .links{display:flex;gap:8px;margin-top:10px;align-items:center;justify-content:center;width:100%}
+    .links a{padding:8px;border-radius:10px;background:transparent;text-decoration:none;color:var(--link-color);font-weight:700;display:inline-flex;align-items:center;gap:8px}
+    /* GitHub icon button */
+    .github-link{width:48px;height:48px;padding:8px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,255,200,0.02));display:inline-flex;align-items:center;justify-content:center;transition:transform 180ms cubic-bezier(.2,.9,.2,1),box-shadow 180ms,background-color 160ms;color:var(--link-color)}
+    .github-link svg{width:22px;height:22px;display:block;fill:currentColor}
+    .github-link:hover,.github-link:focus-visible{transform:scale(1.28);box-shadow:0 18px 60px rgba(0,255,200,0.08);color:#aaffdf}
+    .github-link:active{transform:scale(1.12)}
+    /* subtle reveal label on hover for clarity */
+    .github-link::after{content:'Open GitHub';position:absolute;opacity:0;transform:translateY(-6px);transition:opacity 160ms,transform 160ms;font-size:12px;background:linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));color:#dfffe9;padding:6px 8px;border-radius:6px;white-space:nowrap}
+    .github-link:hover::after,.github-link:focus-visible::after{opacity:1;transform:translateY(-10px)}
+
+    /* blinking cursor for the name */
+    .name-line{display:inline-block;position:relative}
+    .cursor{width:10px;height:20px;background:var(--accent-color);display:inline-block;margin-left:8px;border-radius:2px;vertical-align:middle;animation:blink 1s steps(2,start) infinite}
+    @keyframes blink{50%{opacity:0}} 
+    /* lightburst effect behind the name */
+    .lightburst{position:absolute;inset:auto auto auto 50%;transform:translateX(-50%);pointer-events:none;width:360px;height:120px;display:block;z-index:0}
+    .lightburst .glow{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent-color) 48%, transparent), transparent 60%);filter:blur(24px);opacity:0.9}
+    .lightburst .rays{position:absolute;inset:-40px;filter:blur(8px);opacity:0.65;background:conic-gradient(from 0deg at 50% 50%, color-mix(in srgb, var(--accent-color) 40%, transparent) 0deg 20deg, transparent 20deg 40deg, color-mix(in srgb, var(--accent-color) 28%, transparent) 40deg 60deg, transparent 60deg 80deg, color-mix(in srgb, var(--accent-color) 18%, transparent) 80deg 100deg, transparent 100deg 360deg);mix-blend-mode:screen;border-radius:50%;animation:spinRays 8s linear infinite}
+    @keyframes spinRays{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    /* ensure the name and cursor sit above the lightburst */
+    #name .name-line, #name .cursor{position:relative;z-index:2}
+
+    /* vignette and floating-text styles are in a.css */
+    </style>
+</head>
+<body>
+    <video id="bgVideo" autoplay muted loop playsinline aria-hidden="true">
+        <source src="vagabond.mp4" type="video/mp4">
+        <!-- fallback: nothing, overlay will still show -->
+    </video>
+    <main class="card" role="main">
+        <section class="main">
+            <h1 id="name">
+                <div class="lightburst" aria-hidden="true">
+                    <div class="glow"></div>
+                    <div class="rays"></div>
+                </div>
+                <span class="name-line">Nilavra Sinha</span><span class="cursor" aria-hidden="true"></span>
+            </h1>
+            <p class="subtitle">I am a Web enthusiast in front-end experiments, accessible UI, and clean design.</p>
+            <div class="actions">
+                <button class="toggle" id="toggleProfile" aria-expanded="false" aria-controls="profileCard">Show Profile</button>
+                <button class="toggle" id="themeToggle" title="Toggle theme" aria-pressed="false" style="margin-left:10px;padding:8px 10px;">Dark/Light</button>
+            </div>
+        </section>
+
+        <aside id="profileCard" class="profile hidden" aria-hidden="true">
+            <div class="photo-bubble" id="photoBubble" tabindex="0" aria-label="Profile photo">
+                <div class="avatar" aria-hidden="true" style="display:none">NS</div>
+                <img id="photoPreview" class="photo-img" alt="Profile photo preview" src="photo.jpg">
+            </div>
+            <div class="meta">
+                <div class="tabs" role="tablist" aria-label="Profile tabs">
+                    <button class="tab-button" role="tab" aria-selected="true" aria-controls="panel-profile" id="tab-profile">Profile</button>
+                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="panel-contact" id="tab-contact">Contact</button>
+                </div>
+
+                <div id="panel-profile" class="tab-panel" role="tabpanel" aria-labelledby="tab-profile">
+                    <strong>Nilavra Sinha</strong>
+                    <p>Designer & developer building small, delightful web experiences.</p>
+                    <div style="height:12px;margin-top:6px"></div>
+                    <div class="links">
+                        <a class="github-link" href="https://github.com/skyy-07" target="_blank" rel="noopener noreferrer" aria-label="Open GitHub profile (opens in new tab)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M12 .5C5.65.5.5 5.66.5 12.02c0 5.09 3.29 9.4 7.86 10.93.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.27-1.69-1.27-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.67 1.25 3.32.95.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.72 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 2.87-.39c.97 0 1.95.13 2.87.39 2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.45-2.7 5.42-5.27 5.7.41.36.78 1.07.78 2.15 0 1.55-.01 2.8-.01 3.18 0 .3.2.67.79.55C20.21 21.41 23.5 17.1 23.5 12.02 23.5 5.66 18.35.5 12 .5z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="panel-contact" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-contact">
+                    <strong>Contact</strong>
+                    <p>You can reach me at <a href="mailto:nilavra.s2007@gmail.com">nilavra.s2007@gmail.com</a></p>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="floating-text" id="floatingText" aria-hidden="true">Computer Scienece</div>
+
+    <script>
+        (function(){
+            const bgVideo = document.getElementById('bgVideo');
+            // Respect user preference for reduced motion
+            try{
+                const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if(prefersReduced && bgVideo){ bgVideo.pause(); bgVideo.style.display = 'none'; }
+            }catch(e){ /* ignore */ }
+
+            // If video errors or cannot play, hide it so overlay remains visible
+            if(bgVideo){
+                bgVideo.addEventListener('error', ()=>{ bgVideo.style.display = 'none'; });
+                bgVideo.addEventListener('stalled', ()=>{ bgVideo.style.display = 'none'; });
+            }
+
+            // Profile toggle
+            const btn = document.getElementById('toggleProfile');
+            const card = document.getElementById('profileCard');
+            btn.addEventListener('click', ()=>{
+                const isHidden = card.classList.toggle('hidden');
+                btn.setAttribute('aria-expanded', String(!isHidden));
+                card.setAttribute('aria-hidden', String(isHidden));
+                btn.textContent = isHidden ? 'Show Profile' : 'Hide Profile';
+            });
+            // Keyboard accessibility: toggle with Enter/Space when focused
+            btn.addEventListener('keyup', (e)=>{
+                if(e.key === 'Enter' || e.key === ' '){ btn.click(); }
+            });
+
+            // Theme initialization and toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const root = document.documentElement;
+            function setTheme(name){
+                if(name === 'light') root.setAttribute('data-theme','light');
+                else root.removeAttribute('data-theme');
+                themeToggle.setAttribute('aria-pressed', String(name === 'light'));
+                try{ localStorage.setItem('theme', name); }catch(e){}
+            }
+            // initial
+            try{
+                const saved = localStorage.getItem('theme');
+                if(saved) setTheme(saved);
+                else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) setTheme('light');
+            }catch(e){}
+            themeToggle.addEventListener('click', ()=>{
+                const isLight = root.getAttribute('data-theme') === 'light';
+                setTheme(isLight ? 'dark' : 'light');
+            });
+
+            // Tabs behaviour
+            const tabProfile = document.getElementById('tab-profile');
+            const tabContact = document.getElementById('tab-contact');
+            const panelProfile = document.getElementById('panel-profile');
+            const panelContact = document.getElementById('panel-contact');
+            const tabs = [tabProfile, tabContact];
+
+            function activateTab(selected){
+                tabs.forEach(t=> t.setAttribute('aria-selected', t === selected ? 'true' : 'false'));
+                if(selected === tabProfile){ panelProfile.classList.remove('hidden'); panelContact.classList.add('hidden'); }
+                else { panelContact.classList.remove('hidden'); panelProfile.classList.add('hidden'); }
+            }
+
+            tabProfile.addEventListener('click', ()=> activateTab(tabProfile));
+            tabContact.addEventListener('click', ()=> activateTab(tabContact));
+
+            // Arrow key navigation for tabs
+            tabs.forEach((t,i)=>{
+                t.addEventListener('keydown', (e)=>{
+                    if(e.key === 'ArrowRight'){ tabs[(i+1)%tabs.length].focus(); }
+                    if(e.key === 'ArrowLeft'){ tabs[(i-1+tabs.length)%tabs.length].focus(); }
+                    if(e.key === 'Home'){ tabs[0].focus(); }
+                    if(e.key === 'End'){ tabs[tabs.length-1].focus(); }
+                });
+            });
+            // photo display
+            // Photo display-only: hide avatar if photo exists
+            const photoPreview = document.getElementById('photoPreview');
+            const avatar = document.querySelector('.avatar');
+            if(photoPreview && photoPreview.getAttribute('src')){
+                if(avatar) avatar.style.display = 'none';
+            }
+
+            // Vignette encroachment: show the vignette after a short delay unless the user prefers reduced motion
+            try{
+                const vignette = document.querySelector('.vignette');
+                const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if(vignette){
+                    if(prefersReduced) vignette.classList.add('show');
+                    else setTimeout(()=> vignette.classList.add('show'), 320);
+                }
+            }catch(e){ /* ignore */ }
+
+            // Floating floatingText: move "Computer Scienece" from center to near-top
+            try{
+                const floating = document.getElementById('floatingText');
+                const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if(floating){
+                    if(prefersReduced) floating.classList.add('float-in');
+                    else setTimeout(()=> floating.classList.add('float-in'), 420);
+                }
+            }catch(e){ /* ignore */ }
+        })();
+    </script>
+</body>
+</html>
