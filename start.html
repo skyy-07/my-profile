@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nilavra Sinha</title>
-    <link rel="stylesheet" href="a.css">
     <style>
         :root{
             /* accent uses H S% L% components for convenient hsl() usage */
@@ -160,7 +159,12 @@
     /* ensure the name and cursor sit above the lightburst */
     #name .name-line, #name .cursor{position:relative;z-index:2}
 
-    /* vignette and floating-text styles are in a.css */
+    /* dark vignette that encroaches from all sides */
+    .vignette{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 36%, rgba(0,0,0,0.66) 100%);transform:scale(0.96);opacity:0;transition:transform 900ms cubic-bezier(.2,.9,.2,1),opacity 660ms ease}
+    .vignette.show{transform:scale(1);opacity:1}
+    @media (prefers-reduced-motion: reduce){
+        .vignette{transition:none;opacity:1;transform:none}
+    }
     </style>
 </head>
 <body>
@@ -217,6 +221,8 @@
     </main>
 
     <div class="vignette" aria-hidden="true"></div>
+    <div class="interactive-grid" id="interactiveGrid" aria-hidden="false"></div>
+    <div id="cursorFollower" aria-hidden="true"></div>
 
     <script>
         (function(){
@@ -310,17 +316,68 @@
                 }
             }catch(e){ /* ignore */ }
 
-            // Floating floatingText: move "Computer Scienece" from center to near-top
+            // Interactive grid: create tiles and pointer interactions
             try{
-                const floating = document.getElementById('floatingText');
+                const grid = document.getElementById('interactiveGrid');
+                const follower = document.getElementById('cursorFollower');
                 const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                if(floating){
-                    if(prefersReduced) floating.classList.add('float-in');
-                    else setTimeout(()=> floating.classList.add('float-in'), 420);
+                if(grid){
+                    // determine a sensible tile count based on viewport size
+                    const cols = Math.max(4, Math.floor(window.innerWidth / 160));
+                    const rows = Math.max(3, Math.floor(window.innerHeight / 140));
+                    const tilesCount = cols * rows;
+                    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                    grid.innerHTML = '';
+                    for(let i=0;i<tilesCount;i++){
+                        const t = document.createElement('div');
+                        t.className = 'tile';
+                        t.tabIndex = -1;
+                        grid.appendChild(t);
+                    }
+
+                    // pointer follower logic
+                    let lastX = window.innerWidth/2, lastY = window.innerHeight/2;
+                    let fx = lastX, fy = lastY;
+                    const ease = 0.18;
+
+                    function moveFollower(x,y){
+                        if(!follower) return;
+                        follower.style.left = x + 'px';
+                        follower.style.top = y + 'px';
+                    }
+
+                    if(!prefersReduced){
+                        // smooth trailing loop
+                        (function loop(){
+                            fx += (lastX - fx) * ease;
+                            fy += (lastY - fy) * ease;
+                            moveFollower(fx,fy);
+                            requestAnimationFrame(loop);
+                        })();
+                    } else {
+                        if(follower) follower.classList.add('hidden');
+                    }
+
+                    // pointer move: update last coordinates and tile hover
+                    window.addEventListener('pointermove', (e)=>{
+                        lastX = e.clientX; lastY = e.clientY;
+                        const el = document.elementFromPoint(e.clientX, e.clientY);
+                        grid.querySelectorAll('.tile').forEach(t=> t.classList.remove('hover'));
+                        if(el && el.classList && el.classList.contains('tile')) el.classList.add('hover');
+                    }, {passive:true});
+
+                    // pointerdown: create ripple
+                    window.addEventListener('pointerdown', (e)=>{
+                        const r = document.createElement('div');
+                        r.className = 'ripple';
+                        r.style.left = e.clientX + 'px'; r.style.top = e.clientY + 'px';
+                        document.body.appendChild(r);
+                        setTimeout(()=> r.remove(), 800);
+                    });
                 }
-            }catch(e){ /* ignore */ }
+            }catch(e){ /* ignore grid errors */ }
+
         })();
     </script>
 </body>
-
 </html>
