@@ -1,0 +1,37 @@
+/* a.css - interactive UI styles for start.html
+	 Contains: vignette, floating text, interactive grid, cursor follower, ripple effects
+*/
+
+/* dark vignette that encroaches from all sides */
+.vignette{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(ellipse at center, rgba(0,0,0,0) 36%, rgba(0,0,0,0.66) 100%);transform:scale(0.96);opacity:0;transition:transform 900ms cubic-bezier(.2,.9,.2,1),opacity 660ms ease}
+.vignette.show{transform:scale(1);opacity:1}
+@media (prefers-reduced-motion: reduce){
+	.vignette{transition:none;opacity:1;transform:none}
+}
+
+/* floating text that moves from center to the top of the viewport */
+.floating-text{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) translateY(0);z-index:1002;pointer-events:none;opacity:0;color:var(--text);font-weight:700;font-size:clamp(18px,3.2vw,28px);letter-spacing:0.04em;text-shadow:0 8px 30px rgba(0,0,0,0.6), 0 2px 12px rgba(0,255,200,0.06);transition:transform 900ms cubic-bezier(.2,.9,.2,1),opacity 640ms ease,filter 900ms;filter:blur(0.2px)}
+.floating-text.float-in{opacity:1;transform:translate(-50%,-50%) translateY(calc(-40vh));}
+@media (max-width:720px){ .floating-text{font-size:16px} .floating-text.float-in{transform:translate(-50%,-50%) translateY(calc(-34vh));} }
+@media (prefers-reduced-motion: reduce){ .floating-text{transition:none;transform:translate(-50%,-50%) translateY(calc(-40vh));opacity:1} }
+
+/* Interactive grid and tiles */
+.interactive-grid{position:fixed;inset:0;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;padding:36px;pointer-events:none}
+.interactive-grid .tile{position:relative;pointer-events:auto;height:110px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.06));overflow:hidden;display:block;transition:transform 420ms cubic-bezier(.2,.9,.2,1),filter 420ms,box-shadow 420ms,background 420ms;backdrop-filter: blur(6px) saturate(1.05)}
+.interactive-grid .tile::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg, rgba(0,255,200,0.03), transparent);mix-blend-mode:screen;pointer-events:none}
+.interactive-grid .tile.hover{transform:scale(1.06);filter:brightness(1.06);box-shadow:0 20px 60px rgba(0,255,200,0.06)}
+@media (max-width:720px){ .interactive-grid{padding:18px;gap:8px} .interactive-grid .tile{height:80px} }
+
+/* cursor follower - a soft, colored blob that trails the pointer */
+#cursorFollower{position:fixed;left:0;top:0;transform:translate(-50%,-50%) scale(0.9);width:120px;height:120px;border-radius:999px;pointer-events:none;z-index:1003;mix-blend-mode:screen;background:radial-gradient(circle at 30% 30%, rgba(0,255,200,0.95), rgba(0,180,150,0.55) 30%, rgba(0,120,100,0.08) 60%, transparent 70%);filter:blur(18px);transition:width 420ms ease,height 420ms ease,opacity 320ms ease}
+#cursorFollower.hidden{opacity:0}
+#cursorFollower::after{content:'';position:absolute;inset:0;border-radius:999px;box-shadow:0 6px 30px rgba(0,255,200,0.12) inset}
+
+/* ripple effect for clicks/taps */
+.ripple{position:fixed;border-radius:999px;pointer-events:none;transform:translate(-50%,-50%) scale(0);background:radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0.5) 20%, transparent 60%);opacity:0.9;mix-blend-mode:screen;z-index:1002;animation:rippleAnim 700ms cubic-bezier(.2,.8,.2,1)}
+@keyframes rippleAnim{from{transform:translate(-50%,-50%) scale(0);opacity:0.9}to{transform:translate(-50%,-50%) scale(3.6);opacity:0}}
+
+@media (prefers-reduced-motion: reduce){
+	#cursorFollower, .ripple{transition:none;animation:none}
+}
+
