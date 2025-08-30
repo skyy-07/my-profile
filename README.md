@@ -44,8 +44,8 @@ Animated cursor effect
 
 🚀 Getting Started
 1. Clone the repository
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/skyy-07/my-profile.git
+cd my-profile
 
 2. Open in Browser
 
@@ -53,20 +53,6 @@ Simply open start.html in any modern browser (Chrome, Edge, Firefox, Safari).
 
 Or click here:
 👉 Open Portfolio
-
-🛠️ Customization
-
-Change Name & Bio
-Edit inside <h1> and <p class="subtitle"> tags in start.html.
-
-Update Profile Photo
-Replace photo.jpg with your own image.
-
-Update GitHub Link
-Modify the <a class="github-link" href="..."> in the profile section.
-
-Change Background Video
-Replace vagabond.mp4 with your own .mp4 file.
 
 📱 Responsiveness
 
